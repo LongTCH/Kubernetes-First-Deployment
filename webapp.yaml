@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: longtch/getting-started:v1.0
+        imagePullPolicy: IfNotPresent
+        workingDir: /app
+        ports:
+        - containerPort: 3000
+          name: webapp
+        env:
+          - name: MYSQL_HOST
+            value: mysql-service
+          - name: MYSQL_USER
+            value: root
+          - name: MYSQL_PASSWORD
+            value: secret
+          - name: MYSQL_DB
+            value: todos
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  type: NodePort
+  selector:
+    app: webapp
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 30100
